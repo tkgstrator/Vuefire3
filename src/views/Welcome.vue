@@ -61,9 +61,11 @@ export default {
   created() {
     // ページ表示時にログイン済みかどうかをチェックする
     this.auth.onAuthStateChanged((user) => {
-      this.user_name = user.displayName
-      this.uid = user.uid
-      this.register(user)
+      if (user != null) {
+        this.user_name = user.displayName
+        this.uid = user.uid
+        this.register(user)
+      }
     })
 
     const unsub = onSnapshot(collection(this.db, "users"), (users) => {
@@ -82,11 +84,10 @@ export default {
       const nowDate = new Date()
       const elapsedTime = new Date(limitDate - nowDate)
       this.hour = elapsedTime.getHours() + elapsedTime.getDay() * 24
-      this.minute = elapsedTime.getMinutes()
-      this.second = elapsedTime.getSeconds() 
+      this.minute = ("00" + elapsedTime.getMinutes()).slice(-2)
+      this.second = ("00" + elapsedTime.getSeconds()).slice(-2)
     },
     reminder() {
-      // 1638802800				
       this.timer = setInterval(this.countTime, 1000)
     },
     // 金額を更新
@@ -143,8 +144,6 @@ body {
   background:         linear-gradient(90deg, #EC6F66 10%, #F3A183 90%); /* W3C */
   font-family: 'Raleway', sans-serif; 
   font-size: 20px; 
-  /* display: block; */
-  /* margin: 0 auto; */
 }
 
 h1 {
@@ -203,6 +202,7 @@ select {
 
 button {
   color: #EC6F66;
+  background-color: white;
   width: 120px;
   height: 35px;
   cursor: pointer;
