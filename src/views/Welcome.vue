@@ -7,7 +7,7 @@
   <h3>{{ hour }}:{{ minute }}:{{ second }}</h3>
   <div id="user">
     <h2>参加者{{ user_num }}名</h2>
-    <h3 id="user-probability">あなたの当籤確率{{ (price / total * 100).toFixed(2) }} %</h3>
+    <h3 id="user-probability">あなたの当籤確率<span class="value">{{ (price / total * 100).toFixed(2) }} %</span></h3>
     <h4>あなたの入札金額{{ price }} 円</h4>
   </div>
   <form v-if="uid != null" id="submit">
@@ -156,7 +156,7 @@ h3 {
   font-size: 20px;
   margin: 0px;
   padding: 0px;
-  color: #999;
+  color: #E0E0E0
 }
 
 h4 {
@@ -208,5 +208,9 @@ button {
   cursor: pointer;
   border: none;
   margin: 10px 0;
+}
+
+.value {
+  color: red;
 }
 </style>
