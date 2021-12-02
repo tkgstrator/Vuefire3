@@ -132,6 +132,7 @@ export default {
 #app {
   font-family: 'Zen Kaku Gothic Antique', sans-serif;
   color: white;
+  text-align: center;
 }
 
 body {
@@ -142,6 +143,8 @@ body {
   background:         linear-gradient(90deg, #EC6F66 10%, #F3A183 90%); /* W3C */
   font-family: 'Raleway', sans-serif; 
   font-size: 20px; 
+  /* display: block; */
+  /* margin: 0 auto; */
 }
 
 h1 {
@@ -164,22 +167,23 @@ h4 {
 }
 
 div.wrap {
-  /* width: 600px; */
-  position: absolute;
-  /* top: 50%; */
-  /* left: 50%; */
-  /* transform: translate(-50%, -50%); */
   vertical-align: middle;
 }
 
 div.wrap div {
-  position: relative;
   margin: 20px 0;
 }
 
+#rules {
+  display: block;
+}
+
 ul {
+  /* display: block; */
+  max-width: 600px;
   text-align: left;
   font-size: 14px;
+  margin: 0 auto;
 }
 
 a {
