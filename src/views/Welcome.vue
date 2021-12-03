@@ -1,8 +1,8 @@
 <template>
 <div class="wrap">
   <h1>Presents</h1>
-  <h3><a href="https://pbs.twimg.com/media/FFm6wTpVgAAzRon?format=jpg&name=large">ワイヤレスイヤホン 1名様</a></h3>
-  <h4>クリックで賞品画像が見れます</h4>
+  <router-link to="/item">ワイアレスイヤホン一名様</router-link>
+  <h4>クリックで賞品情報詳細が見れます</h4>
   <h3>12/03 00:00 - 12/05 23:59</h3>
   <h3>{{ hour }}:{{ minute }}:{{ second }}</h3>
   <div id="user">
@@ -22,7 +22,9 @@
     <h2>規約</h2>
     <ul>
       <li>誰でも参加することができます</li>
-      <li>入札金額が上がれば当籤確率が上がります</li>
+      <li>入札金額が上がれば当籤/落札確率が上がります</li>
+      <li><span class="text-color-blue">落札できたとき</span>だけ入札金額をお支払いください</li>
+      <li><span class="text-important">落札できなかったとき</span>は支払う必要はありません</li>
       <li>入札はいつでも取り消すことができます</li>
       <li>送料は落札者様負担になります</li>
       <li>返品・返金は一切できません</li>
@@ -132,16 +134,12 @@ export default {
 
 #app {
   font-family: 'Zen Kaku Gothic Antique', sans-serif;
-  color: white;
+  color: #85837a;
   text-align: center;
 }
 
 body {
-  background: -webkit-linear-gradient(90deg, #EC6F66 10%, #F3A183 90%); /* Chrome 10+, Saf5.1+ */
-  background:    -moz-linear-gradient(90deg, #EC6F66 10%, #F3A183 90%); /* FF3.6+ */
-  background:     -ms-linear-gradient(90deg, #EC6F66 10%, #F3A183 90%); /* IE10 */
-  background:      -o-linear-gradient(90deg, #EC6F66 10%, #F3A183 90%); /* Opera 11.10+ */
-  background:         linear-gradient(90deg, #EC6F66 10%, #F3A183 90%); /* W3C */
+  background: #f6f6f4;
   font-family: 'Raleway', sans-serif; 
   font-size: 20px; 
 }
@@ -156,7 +154,7 @@ h3 {
   font-size: 20px;
   margin: 0px;
   padding: 0px;
-  color: #E0E0E0
+  color: #364549;
 }
 
 h4 {
@@ -211,6 +209,14 @@ button {
 }
 
 .value {
+  color: red;
+}
+
+.text-color-blue {
+  color: blue;
+}
+
+.text-important {
   color: red;
 }
 </style>
