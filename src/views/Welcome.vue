@@ -82,12 +82,13 @@ export default {
   methods: {
     // 残り時間を表示
     countTime() {
-      const limitDate = new Date(2021,12,6,0,0)
+      const limitDate = new Date(2021, 11, 5, 23, 59)
       const nowDate = new Date()
       const elapsedTime = new Date(limitDate - nowDate)
-      this.hour = elapsedTime.getHours() + elapsedTime.getDay() * 24
-      this.minute = ("00" + elapsedTime.getMinutes()).slice(-2)
-      this.second = ("00" + elapsedTime.getSeconds()).slice(-2)
+      this.hour = elapsedTime.getUTCHours()
+      // + elapsedTime.getUTCDay() * 24
+      this.minute = ("00" + elapsedTime.getUTCMinutes()).slice(-2)
+      this.second = ("00" + elapsedTime.getUTCSeconds()).slice(-2)
     },
     reminder() {
       this.timer = setInterval(this.countTime, 1000)
