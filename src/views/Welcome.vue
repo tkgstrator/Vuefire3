@@ -7,7 +7,9 @@
   <h3>{{ hour }}:{{ minute }}:{{ second }}</h3>
   <div id="user">
     <h2>参加者{{ user_num }}名</h2>
-    <h3 id="user-probability">あなたの当籤確率<span class="value">{{ (price / total * 100).toFixed(2) }} %</span></h3>
+    <!-- <h3 id="user-probability">あなたの当籤確率<span class="value">{{ (price / total * 100).toFixed(2) }} %</span></h3> -->
+    <h3 id="user-probability">あなたは{{ success == screenName ? "当籤" : "落選" }}しました</h3>
+    <h3 id="user-probability">{{ success == screenName ? uid : uid.shuffle() }}</h3>
     <h4>あなたの入札金額{{ price }} 円</h4>
   </div>
   <form v-if="uid != null" id="submit">
@@ -40,6 +42,38 @@
 import { getAuth, signInWithPopup, TwitterAuthProvider } from "@firebase/auth"
 import { doc, getFirestore, onSnapshot, collection, setDoc, getDoc, updateDoc } from "@firebase/firestore"
 
+String.prototype.shuffle = function () {
+    var a = this.split(""),
+        n = a.length;
+
+    for(var i = n - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i];
+        a[i] = a[j];
+        a[j] = tmp;
+    }
+    return a.join("");
+}
+
+class Random {
+  constructor(seed = 88675123) {
+    this.mSeed1 = (Math.imul(0x6C078965, (seed ^ (seed >>> 30))) + 1) >>> 0;
+    this.mSeed2 = (Math.imul(0x6C078965, (this.mSeed1 ^ (this.mSeed1 >>> 30))) + 2) >>> 0;
+    this.mSeed3 = (Math.imul(0x6C078965, (this.mSeed2 ^ (this.mSeed2 >>> 30))) + 3) >>> 0;
+    this.mSeed4 = (Math.imul(0x6C078965, (this.mSeed3 ^ (this.mSeed3 >>> 30))) + 4) >>> 0;
+  }
+  
+  // XorShift
+  getU32() {
+    let n = (this.mSeed1 ^ (this.mSeed1 << 11)) >>> 0;
+    this.mSeed1 = this.mSeed2;
+    this.mSeed2 = this.mSeed3;
+    this.mSeed3 = this.mSeed4;
+    this.mSeed4 = ((n ^ (n >>> 8) ^ this.mSeed4 ^ (this.mSeed4 >>> 19))) >>> 0;
+    return this.mSeed4;
+  }
+}
+
 export default {
   components: {
   },
@@ -57,7 +91,9 @@ export default {
       timer: null,
       hour: 0,
       minute: 0,
-      second: 0
+      second: 0,
+      success: null,
+      screenName: null
     }
   },
   created() {
@@ -65,18 +101,38 @@ export default {
     this.auth.onAuthStateChanged((user) => {
       if (user != null) {
         this.user_name = user.displayName
+        this.screenName = user.reloadUserInfo.screenName
         this.uid = user.uid
         this.register(user)
       }
     })
 
-    const unsub = onSnapshot(collection(this.db, "users"), (users) => {
-      this.user_num = users.size
-      this.total = users.docs.map((user) => { 
-        return parseInt(user.data().price)
+    const unsub = onSnapshot(collection(this.db, "users"), (data) => {
+      this.user_num = data.size
+      const users = data.docs.map((user) => { 
+        return user.data()
        })
-       .reduce((prev, next) => prev + next, 0)
-      this.reminder()
+
+       const prices = users.map((user) => {
+         return parseInt(user.price)
+       })
+
+       this.total = users.reduce((prev, next) => prev.price + next.price, 0)
+
+       const seed = 7629671 // tkg -> hex -> dec
+       const rnd = new Random(seed)
+       const random_number = rnd.getU32()
+       let sum = 0
+
+       users.forEach((user) => {
+         let price = (parseInt(user.price) / 100)
+         sum += price
+         if (rnd.getU32() * sum / Math.pow(2, 32) < price) {
+           this.success = user.uid
+         }
+       })
+
+       this.reminder()
     })
   },
   methods: {
@@ -84,11 +140,16 @@ export default {
     countTime() {
       const limitDate = new Date(2021, 11, 5, 23, 59)
       const nowDate = new Date()
+      if (limitDate > nowDate) {
       const elapsedTime = new Date(limitDate - nowDate)
-      this.hour = elapsedTime.getUTCHours()
-      // + elapsedTime.getUTCDay() * 24
-      this.minute = ("00" + elapsedTime.getUTCMinutes()).slice(-2)
-      this.second = ("00" + elapsedTime.getUTCSeconds()).slice(-2)
+        this.hour = ("00" + elapsedTime.getUTCHours() + elapsedTime.getUTCDate() * 24).slice(-2)
+        this.minute = ("00" + elapsedTime.getUTCMinutes()).slice(-2)
+        this.second = ("00" + elapsedTime.getUTCSeconds()).slice(-2)
+      } else {
+        this.hour = "00"
+        this.minute = "00"
+        this.second = "00"
+      }
     },
     reminder() {
       this.timer = setInterval(this.countTime, 1000)
